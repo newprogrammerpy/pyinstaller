@@ -1,0 +1,107 @@
+name: Build Multi-Platform
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-windows-64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          architecture: 'x64'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-windows-amd64.exe main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-windows-amd64
+          path: dist/*
+
+  build-windows-32:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          architecture: 'x86'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-windows-x86.exe main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-windows-x86
+          path: dist/*
+
+  build-windows-arm64:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-windows-arm64.exe main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-windows-arm64
+          path: dist/*
+
+  build-macos-intel:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-macos-amd64 main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-macos-amd64
+          path: dist/*
+
+  build-macos-arm:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-macos-arm64 main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-macos-arm64
+          path: dist/*
+
+  build-linux-64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-linux-amd64 main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-linux-amd64
+          path: dist/*
+
+  build-linux-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: pip install pyinstaller
+      - run: pyinstaller --onefile --name app-linux-arm64 main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-linux-arm64
+          path: dist/*
