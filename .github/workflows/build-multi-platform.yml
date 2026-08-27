@@ -2,8 +2,19 @@ name: Build Multi-Platform
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+    inputs:
+      tool:
+        description: "Chọn công cụ build (1 = Nuitka, 2 = PyInstaller)"
+        required: true
+        type: choice
+        options:
+          - "1"
+          - "2"
+        default: "2"
+      build_command:
+        description: "Câu lệnh build (vd: pyinstaller --onefile --windowed main.py)"
+        required: true
+        type: string
 
 jobs:
   build-windows-64:
@@ -14,12 +25,21 @@ jobs:
         with:
           python-version: '3.14'
           architecture: 'x64'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-windows-amd64.exe main.py
+      - name: Cai dat cong cu
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") {
+            pip install nuitka
+          } else {
+            pip install pyinstaller
+          }
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-windows-amd64
-          path: dist/*
+          path: |
+            dist/*
+            *.exe
 
   build-windows-32:
     runs-on: windows-latest
@@ -29,12 +49,21 @@ jobs:
         with:
           python-version: '3.14'
           architecture: 'x86'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-windows-x86.exe main.py
+      - name: Cai dat cong cu
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") {
+            pip install nuitka
+          } else {
+            pip install pyinstaller
+          }
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-windows-x86
-          path: dist/*
+          path: |
+            dist/*
+            *.exe
 
   build-windows-arm64:
     runs-on: windows-11-arm
@@ -43,12 +72,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-windows-arm64.exe main.py
+      - name: Cai dat cong cu
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") {
+            pip install nuitka
+          } else {
+            pip install pyinstaller
+          }
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-windows-arm64
-          path: dist/*
+          path: |
+            dist/*
+            *.exe
 
   build-macos-intel:
     runs-on: macos-13
@@ -57,12 +95,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-macos-amd64 main.py
+      - name: Cai dat cong cu
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then
+            pip install nuitka
+          else
+            pip install pyinstaller
+          fi
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-macos-amd64
-          path: dist/*
+          path: |
+            dist/*
+            *.bin
+            *.app
 
   build-macos-arm:
     runs-on: macos-14
@@ -71,12 +119,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-macos-arm64 main.py
+      - name: Cai dat cong cu
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then
+            pip install nuitka
+          else
+            pip install pyinstaller
+          fi
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-macos-arm64
-          path: dist/*
+          path: |
+            dist/*
+            *.bin
+            *.app
 
   build-linux-64:
     runs-on: ubuntu-latest
@@ -85,12 +143,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-linux-amd64 main.py
+      - name: Cai dat cong cu
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then
+            pip install nuitka
+          else
+            pip install pyinstaller
+          fi
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-linux-amd64
-          path: dist/*
+          path: |
+            dist/*
+            *.bin
 
   build-linux-arm64:
     runs-on: ubuntu-24.04-arm
@@ -99,9 +166,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
-      - run: pip install pyinstaller
-      - run: pyinstaller --onefile --name app-linux-arm64 main.py
+      - name: Cai dat cong cu
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then
+            pip install nuitka
+          else
+            pip install pyinstaller
+          fi
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
       - uses: actions/upload-artifact@v4
         with:
           name: app-linux-arm64
-          path: dist/*
+          path: |
+            dist/*
+            *.bin
