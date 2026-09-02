@@ -36,7 +36,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -66,7 +70,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -96,7 +104,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -126,7 +138,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -156,7 +172,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -186,7 +206,11 @@ jobs:
         run: |
           if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python auto_install.py main.py
+        run: |
+          $target = (${{ toJson(inputs.build_command) }} -split '\s+') | Where-Object { $_ -match '\.py$' } | Select-Object -First 1
+          if (-not $target) { $target = "main.py" }
+          Write-Host "File duoc quet: $target"
+          python auto_install.py $target
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -216,7 +240,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -247,7 +275,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -278,7 +310,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -309,7 +345,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -342,7 +382,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -373,7 +417,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -404,7 +452,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py 
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target"
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -442,7 +494,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka --break-system-packages; else pip3 install pyinstaller --break-system-packages; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py break
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target" break
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
@@ -475,7 +531,11 @@ jobs:
         run: |
           if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka --break-system-packages; else pip3 install pyinstaller --break-system-packages; fi
       - name: Tu dong cai thu vien con thieu (hidden imports)
-        run: python3 auto_install.py main.py break
+        run: |
+          target=$(echo "${{ inputs.build_command }}" | tr ' ' '\n' | grep -E '\.py$' | head -n1)
+          if [ -z "$target" ]; then target="main.py"; fi
+          echo "File duoc quet: $target"
+          python3 auto_install.py "$target" break
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
       - name: Double check ket qua build
