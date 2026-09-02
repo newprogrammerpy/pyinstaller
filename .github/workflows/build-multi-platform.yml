@@ -17,167 +17,476 @@ on:
         type: string
 
 jobs:
-  build-windows-64:
-    runs-on: windows-latest
+  # ================= WINDOWS =================
+
+  build-windows-2022-64:
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-          architecture: 'x64'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10', architecture: 'x64' }
+      - name: Nang cap pip va certifi
         run: |
-          if ("${{ inputs.tool }}" -eq "1") {
-            pip install nuitka
-          } else {
-            pip install pyinstaller
-          }
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-windows-amd64
-          path: |
-            dist/*
-            *.exe
+        with: { name: app-windows-2022-amd64, path: "dist/*\n*.exe" }
+
+  build-windows-2025-64:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10', architecture: 'x64' }
+      - name: Nang cap pip va certifi
+        run: |
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
+      - uses: actions/upload-artifact@v4
+        with: { name: app-windows-2025-amd64, path: "dist/*\n*.exe" }
+
+  build-windows-2025-vs2026-64:
+    runs-on: windows-2025-vs2026
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10', architecture: 'x64' }
+      - name: Nang cap pip va certifi
+        run: |
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
+      - uses: actions/upload-artifact@v4
+        with: { name: app-windows-2025-vs2026-amd64, path: "dist/*\n*.exe" }
 
   build-windows-32:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-          architecture: 'x86'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10', architecture: 'x86' }
+      - name: Nang cap pip va certifi
         run: |
-          if ("${{ inputs.tool }}" -eq "1") {
-            pip install nuitka
-          } else {
-            pip install pyinstaller
-          }
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-windows-x86
-          path: |
-            dist/*
-            *.exe
+        with: { name: app-windows-x86, path: "dist/*\n*.exe" }
 
   build-windows-arm64:
     runs-on: windows-11-arm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
         run: |
-          if ("${{ inputs.tool }}" -eq "1") {
-            pip install nuitka
-          } else {
-            pip install pyinstaller
-          }
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-windows-arm64
-          path: |
-            dist/*
-            *.exe
+        with: { name: app-windows-arm64, path: "dist/*\n*.exe" }
+
+  build-windows-vs2026-arm64:
+    runs-on: windows-11-vs2026-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
+        run: |
+          python -m pip install --upgrade pip certifi
+      - name: Ghi script tu dong phat hien import
+        run: |
+          $bytes = [Convert]::FromBase64String("aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg==")
+          [IO.File]::WriteAllText("auto_install.py", [Text.Encoding]::UTF8.GetString($bytes))
+      - name: Cai dat cong cu build
+        run: |
+          if ("${{ inputs.tool }}" -eq "1") { pip install nuitka } else { pip install pyinstaller }
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python auto_install.py main.py
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for ($i=1; $i -le 2; $i++) {
+            Write-Host "=== Lan kiem tra $i ==="
+            $found = (Get-ChildItem -Path dist -ErrorAction SilentlyContinue) -or (Get-ChildItem -Filter *.exe -ErrorAction SilentlyContinue)
+            if ($found) { Write-Host "OK: tim thay file build." } else { Write-Host "CANH BAO: khong tim thay file build o lan kiem tra $i." }
+          }
+      - uses: actions/upload-artifact@v4
+        with: { name: app-windows-vs2026-arm64, path: "dist/*\n*.exe" }
+
+  # ================= MACOS =================
 
   build-macos-intel:
-    runs-on: macos-14
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
         run: |
-          if [ "${{ inputs.tool }}" = "1" ]; then
-            pip install nuitka
-          else
-            pip install pyinstaller
-          fi
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-macos-amd64
-          path: |
-            dist/*
-            *.bin
-            *.app
+        with: { name: app-macos-intel-amd64, path: "dist/*\n*.bin\n*.app" }
 
-  build-macos-arm:
-    runs-on: macos-14
+  build-macos-15-arm:
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
         run: |
-          if [ "${{ inputs.tool }}" = "1" ]; then
-            pip install nuitka
-          else
-            pip install pyinstaller
-          fi
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-macos-arm64
-          path: |
-            dist/*
-            *.bin
-            *.app
+        with: { name: app-macos-15-arm64, path: "dist/*\n*.bin\n*.app" }
 
-  build-linux-64:
-    runs-on: ubuntu-latest
+  build-macos-26-arm:
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
         run: |
-          if [ "${{ inputs.tool }}" = "1" ]; then
-            pip install nuitka
-          else
-            pip install pyinstaller
-          fi
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-linux-amd64
-          path: |
-            dist/*
-            *.bin
+        with: { name: app-macos-26-arm64, path: "dist/*\n*.bin\n*.app" }
+
+  build-macos-26-intel:
+    runs-on: macos-26-intel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
+        run: |
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: app-macos-26-intel-amd64, path: "dist/*\n*.bin\n*.app" }
+
+  # ================= LINUX (Ubuntu - runner chinh thuc cua GitHub) =================
+
+  build-linux-ubuntu2204-64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
+        run: |
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: app-linux-ubuntu2204-amd64, path: "dist/*\n*.bin" }
+
+  build-linux-ubuntu2404-64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
+        run: |
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: app-linux-ubuntu2404-amd64, path: "dist/*\n*.bin" }
 
   build-linux-arm64:
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-      - name: Cai dat cong cu
+        with: { python-version: '3.12.10' }
+      - name: Nang cap pip va certifi
         run: |
-          if [ "${{ inputs.tool }}" = "1" ]; then
-            pip install nuitka
-          else
-            pip install pyinstaller
-          fi
+          python3 -m pip install --upgrade pip certifi 
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka ; else pip3 install pyinstaller ; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py 
       - name: Chay lenh build
         run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
       - uses: actions/upload-artifact@v4
-        with:
-          name: app-linux-arm64
-          path: |
-            dist/*
-            *.bin
+        with: { name: app-linux-arm64, path: "dist/*\n*.bin" }
+
+  # ================= LINUX (Debian / Fedora qua Docker container) =================
+  # GitHub KHONG co runner rieng cho Debian/Fedora, nen chay tren nen ubuntu-latest
+  # nhung thuc thi lenh build ben trong container Debian/Fedora tuong ung.
+
+  build-linux-debian-64:
+    runs-on: ubuntu-latest
+    container: debian:bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cai dat Python + pip
+        run: |
+          apt-get update
+          apt-get install -y python3 python3-pip python3-venv
+      - name: Nang cap pip va certifi
+        run: |
+          python3 -m pip install --upgrade pip certifi --break-system-packages
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka --break-system-packages; else pip3 install pyinstaller --break-system-packages; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py break
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: app-linux-debian-amd64, path: "dist/*\n*.bin" }
+
+  build-linux-fedora-64:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cai dat Python + pip
+        run: |
+          dnf install -y python3 python3-pip
+      - name: Nang cap pip va certifi
+        run: |
+          python3 -m pip install --upgrade pip certifi --break-system-packages
+      - name: Ghi script tu dong phat hien import
+        run: echo aW1wb3J0IGFzdCwgc3lzLCBzdWJwcm9jZXNzLCBpbXBvcnRsaWIudXRpbAp0cnk6CiAgICBzdGRsaWIgPSBzZXQoc3lzLnN0ZGxpYl9tb2R1bGVfbmFtZXMpCmV4Y2VwdCBBdHRyaWJ1dGVFcnJvcjoKICAgIHN0ZGxpYiA9IHNldCgpCm1hcHBpbmcgPSB7CiAgICAiY3YyIjogIm9wZW5jdi1weXRob24iLCAiUElMIjogIlBpbGxvdyIsICJ5YW1sIjogIlB5WUFNTCIsCiAgICAic2tsZWFybiI6ICJzY2lraXQtbGVhcm4iLCAiYnM0IjogImJlYXV0aWZ1bHNvdXA0IiwgInNlcmlhbCI6ICJweXNlcmlhbCIsCiAgICAid2luMzJhcGkiOiAicHl3aW4zMiIsICJ3aW4zMmNvbiI6ICJweXdpbjMyIiwgIndpbjMyZ3VpIjogInB5d2luMzIiLAogICAgIkNyeXB0byI6ICJweWNyeXB0b2RvbWUiLCAiZG90ZW52IjogInB5dGhvbi1kb3RlbnYiLAp9CnRhcmdldCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAxIGVsc2UgIm1haW4ucHkiCndpdGggb3Blbih0YXJnZXQsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6CiAgICB0cmVlID0gYXN0LnBhcnNlKGYucmVhZCgpLCBmaWxlbmFtZT10YXJnZXQpCm5hbWVzID0gc2V0KCkKZm9yIG5vZGUgaW4gYXN0LndhbGsodHJlZSk6CiAgICBpZiBpc2luc3RhbmNlKG5vZGUsIGFzdC5JbXBvcnQpOgogICAgICAgIGZvciBuIGluIG5vZGUubmFtZXM6CiAgICAgICAgICAgIG5hbWVzLmFkZChuLm5hbWUuc3BsaXQoIi4iKVswXSkKICAgIGVsaWYgaXNpbnN0YW5jZShub2RlLCBhc3QuSW1wb3J0RnJvbSk6CiAgICAgICAgaWYgbm9kZS5tb2R1bGUgYW5kIG5vZGUubGV2ZWwgPT0gMDoKICAgICAgICAgICAgbmFtZXMuYWRkKG5vZGUubW9kdWxlLnNwbGl0KCIuIilbMF0pCnRvX2luc3RhbGwgPSBbXQpmb3IgbmFtZSBpbiBzb3J0ZWQobmFtZXMpOgogICAgaWYgbmFtZSBpbiBzdGRsaWI6CiAgICAgICAgY29udGludWUKICAgIGlmIGltcG9ydGxpYi51dGlsLmZpbmRfc3BlYyhuYW1lKSBpcyBub3QgTm9uZToKICAgICAgICBjb250aW51ZQogICAgdG9faW5zdGFsbC5hcHBlbmQobWFwcGluZy5nZXQobmFtZSwgbmFtZSkpCmlmIHRvX2luc3RhbGw6CiAgICBwcmludCgiVHUgZG9uZyBjYWkgZGF0IHRodSB2aWVuIGNvbiB0aGlldToiLCB0b19pbnN0YWxsKQogICAgY21kID0gW3N5cy5leGVjdXRhYmxlLCAiLW0iLCAicGlwIiwgImluc3RhbGwiXSArIHRvX2luc3RhbGwKICAgIGlmIGxlbihzeXMuYXJndikgPiAyIGFuZCBzeXMuYXJndlsyXSA9PSAiYnJlYWsiOgogICAgICAgIGNtZC5hcHBlbmQoIi0tYnJlYWstc3lzdGVtLXBhY2thZ2VzIikKICAgIHIgPSBzdWJwcm9jZXNzLnJ1bihjbWQsIGNoZWNrPUZhbHNlKQogICAgaWYgci5yZXR1cm5jb2RlICE9IDA6CiAgICAgICAgcHJpbnQoIkNBTkggQkFPOiBtb3QgdmFpIHRodSB2aWVuIGNhaSBraG9uZyB0aGFuaCBjb25nLCB4ZW0gbG9nIGJlbiB0cmVuLiIpCmVsc2U6CiAgICBwcmludCgiS2hvbmcgdGhpZXUgdGh1IHZpZW4gbmFvLiIpCg== | base64 -d > auto_install.py
+      - name: Cai dat cong cu build
+        run: |
+          if [ "${{ inputs.tool }}" = "1" ]; then pip3 install nuitka --break-system-packages; else pip3 install pyinstaller --break-system-packages; fi
+      - name: Tu dong cai thu vien con thieu (hidden imports)
+        run: python3 auto_install.py main.py break
+      - name: Chay lenh build
+        run: ${{ inputs.build_command }}
+      - name: Double check ket qua build
+        run: |
+          for i in 1 2; do
+            echo "=== Lan kiem tra $i ==="
+            if compgen -G "dist/*" > /dev/null 2>&1 || compgen -G "*.bin" > /dev/null 2>&1 || compgen -G "*.app" > /dev/null 2>&1; then
+              echo "OK: tim thay file build."
+            else
+              echo "CANH BAO: khong tim thay file build o lan kiem tra $i."
+            fi
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: app-linux-fedora-amd64, path: "dist/*\n*.bin" }
